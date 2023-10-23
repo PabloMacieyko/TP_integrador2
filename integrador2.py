@@ -65,7 +65,7 @@ class Curso:
     def agregar_archivo(self, archivo):
         self.archivos.append(archivo)
 
-
+#usuarios de prueba:
 alumno1 = Estudiante("Juan", "Pérez", "juan@gmail.com",
                      "password1", 12345, 2022)
 profesor1 = Profesor("Profesor", "Ejemplo",
@@ -85,7 +85,7 @@ profesor1.dictar_curso(curso4)
 profesor1.dictar_curso(curso5)
 profesor1.dictar_curso(curso6)
 
-
+#funcion para buscar alumno
 def login_alumno(email, password):
     for alumno in alumnos:
         if alumno.email == email:
@@ -100,7 +100,7 @@ def login_alumno(email, password):
     print("Debe darse de alta en alumnado.")
     return None
 
-
+#para buscar profesor
 def login_profesor(email, password):
     for profesor in profesores:
         if profesor.email == email:
@@ -174,9 +174,11 @@ while True:
                     for i, curso in enumerate(alumno.mi_cursos, start=1):
                         print(f"{i}. {curso.nombre}")
 
-
                 elif sub_opcion == "3":
                     break
+
+                else:
+                    print("Opción no válida. Por favor, seleccione una opción válida.")
 
     elif opcion == "2":
         email = input("Ingrese su email como profesor: ")
@@ -195,9 +197,18 @@ while True:
                 if sub_opcion == "1":
                     nombre_curso = input(
                         "Ingrese el nombre del curso a dar de alta: ")
-                    nuevo_curso = Curso(nombre_curso)
-                    profesor.dictar_curso(nuevo_curso)
-                    print(f"Curso dado de alta:\n{str(nuevo_curso)}")
+                    
+                    curso_existente = None
+                    for curso in profesor.mis_cursos:
+                        if curso.nombre == nombre_curso:
+                            curso_existente = curso
+                            break
+                    if curso_existente:
+                        print(f"El curso '{nombre_curso}' ya ha sido dado de alta!")
+                    else:
+                        nuevo_curso = Curso(nombre_curso)
+                        profesor.dictar_curso(nuevo_curso)
+                        print(f"Curso dado de alta:\n{str(nuevo_curso)}")
 
                 elif sub_opcion == "2":
                     print("\nCursos dictados:")
@@ -207,6 +218,9 @@ while True:
 
                 elif sub_opcion == "3":
                     break
+                else:
+                    print("Opción no válida. Por favor, seleccione una opción válida.")
+
 
     elif opcion == "3":
         print("\nCursos en el sistema:")
