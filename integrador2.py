@@ -19,8 +19,6 @@ class Usuario(ABC):
 class Estudiante(Usuario):
     def __init__(self, nombre, apellido, email, password, legajo, anio_inscripcion_carrera):
         super().__init__(nombre, apellido, email, password)
-        self.nombre = nombre
-        self.apellido = apellido
         self.legajo = legajo
         self.anio_inscripcion_carrera = anio_inscripcion_carrera
         self.mi_cursos = []
@@ -39,8 +37,6 @@ class Estudiante(Usuario):
 class Profesor(Usuario):
     def __init__(self, nombre, apellido, email, password, titulo, anio_egreso):
         super().__init__(nombre, apellido, email, password)
-        self.nombre = nombre
-        self.apellido = apellido
         self.titulo = titulo
         self.anio_egreso = anio_egreso
         self.mis_cursos = []
