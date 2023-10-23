@@ -164,9 +164,9 @@ while True:
                             else:
                                 print("Error: Contraseña incorrecta para el curso.")
                         else:
-                            print("Error: Ya está matriculado en este curso.")
+                            print("Error: Ya se encuentra matriculado en este curso.")
                     else:
-                        print("Error: Selección inválida.")
+                        print("Error: Seleccion no valida.")
 
 
                 elif sub_opcion == "2":
@@ -174,14 +174,6 @@ while True:
                     for i, curso in enumerate(alumno.mi_cursos, start=1):
                         print(f"{i}. {curso.nombre}")
 
-                    curso_index = int(
-                        input("Seleccione un curso para ver archivos: ")) - 1
-
-                    if 0 <= curso_index < len(alumno.mi_cursos):
-                        curso_seleccionado = alumno.mi_cursos[curso_index]
-                        print(f"Archivos en {curso_seleccionado.nombre}:")
-                        for archivo in curso_seleccionado.archivos:
-                            print(archivo)
 
                 elif sub_opcion == "3":
                     break
