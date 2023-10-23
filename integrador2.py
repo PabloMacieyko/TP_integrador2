@@ -88,16 +88,29 @@ profesor1.dictar_curso(curso6)
 
 def login_alumno(email, password):
     for alumno in alumnos:
-        if alumno.validar_credenciales(email, password):
-            return alumno
+        if alumno.email == email:
+
+            if alumno.validar_credenciales(email, password):
+                return alumno
+            else:
+                print("Error de ingreso. La contraseña es incorrecta.")
+            return None
+
+    print("Error de ingreso. No se encontro un alumno con ese correo.")
+    print("Debe darse de alta en alumnado.")
     return None
 
 
 def login_profesor(email, password):
     for profesor in profesores:
-        if profesor.validar_credenciales(email, password):
-            return profesor
-    return None
+        if profesor.email == email:
+            if profesor.validar_credenciales(email, password):
+                return profesor
+            else:
+                print("Error de ingreso. Contraseña incorrecta.")
+            return None
+    print("Error de ingreso. No se encontro email registrado.")
+    print("Por favor, debe darse de alta en alumnado. ")
 
 
 alumnos = [alumno1]
@@ -137,15 +150,24 @@ while True:
 
                     if 0 <= curso_index < len(cursos_sistema):
                         curso_seleccionado = cursos_sistema[curso_index]
-                        matriculado = alumno.matricular_en_curso(
-                            curso_seleccionado)
 
-                        if matriculado:
-                            print(
-                                f"Matriculación exitosa en {curso_seleccionado.nombre}")
+                        if curso_seleccionado not in alumno.mi_cursos:
+                            contraseña_curso = input(f"Ingrese la contraseña para {curso_seleccionado.nombre}: ")
+
+                            if contraseña_curso == curso_seleccionado.contraseña:
+                                
+                                matriculado = alumno.matricular_en_curso(curso_seleccionado)
+                                if matriculado:
+                                    print(f"Matriculación exitosa en {curso_seleccionado.nombre}")
+                                else:
+                                    print("Error: No se pudo matricular en el curso.")
+                            else:
+                                print("Error: Contraseña incorrecta para el curso.")
                         else:
-                            print(
-                                f"Ya está matriculado en {curso_seleccionado.nombre}")
+                            print("Error: Ya está matriculado en este curso.")
+                    else:
+                        print("Error: Selección inválida.")
+
 
                 elif sub_opcion == "2":
                     print("\nCursos matriculados:")
@@ -163,8 +185,6 @@ while True:
 
                 elif sub_opcion == "3":
                     break
-        else:
-            print("El email o contraseña ingresados no se encuentran registrados. Por favor registrese")
 
     elif opcion == "2":
         email = input("Ingrese su email como profesor: ")
@@ -195,8 +215,6 @@ while True:
 
                 elif sub_opcion == "3":
                     break
-        else:
-            print("El email o contraseña ingresados no se encuentran registrados. Por favor hable en alumnado")
 
     elif opcion == "3":
         print("\nCursos en el sistema:")
