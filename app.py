@@ -1,71 +1,10 @@
-from abc import ABC, abstractmethod
-import random
-
-
-class Usuario(ABC):
-    def __init__(self, nombre, apellido, email, password):
-        self.nombre = nombre
-        self.apellido = apellido
-        self.email = email
-        self.password = password
-
-    def __str__(self):
-        return self.email
-
-    def validar_credenciales(self, email, password):
-        return self.email == email and self.password == password
-
-
-class Estudiante(Usuario):
-    def __init__(self, nombre, apellido, email, password, legajo, anio_inscripcion_carrera):
-        super().__init__(nombre, apellido, email, password)
-        self.legajo = legajo
-        self.anio_inscripcion_carrera = anio_inscripcion_carrera
-        self.mi_cursos = []
-
-    def __str__(self):
-        return f"Estudiante: {self.nombre} {self.apellido}, Legajo: {self.legajo}, Año de Inscripción: {self.anio_inscripcion_carrera}"
-
-    def matricular_en_curso(self, curso):
-        if curso not in self.mi_cursos:
-            self.mi_cursos.append(curso)
-            return True
-        else:
-            return False
-
-
-class Profesor(Usuario):
-    def __init__(self, nombre, apellido, email, password, titulo, anio_egreso):
-        super().__init__(nombre, apellido, email, password)
-        self.titulo = titulo
-        self.anio_egreso = anio_egreso
-        self.mis_cursos = []
-
-    def __str__(self):
-        return f"Profesor: {self.nombre} {self.apellido}, Título: {self.titulo}, Año de Egreso: {self.anio_egreso}"
-
-    def dictar_curso(self, curso):
-        self.mis_cursos.append(curso)
-
-
-class Curso:
-    def __init__(self, nombre):
-        self.nombre = nombre
-        self.contraseña = ''.join(random.choice(
-            '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ') for i in range(6))
-        self.archivos = []
-
-    def __str__(self):
-        return f"Nombre: {self.nombre}\nContraseña: {self.contraseña}"
-
-    def agregar_archivo(self, archivo):
-        self.archivos.append(archivo)
+from usuario import Usuario, Estudiante, Profesor
+from curso import Curso
+from archivo import Archivo
 
 #usuarios de prueba:
-alumno1 = Estudiante("Juan", "Pérez", "juan@gmail.com",
-                     "password1", 12345, 2022)
-profesor1 = Profesor("Profesor", "Ejemplo",
-                     "prof@gmail.com", "password2", "PhD", 2010)
+alumno1 = Estudiante("Juan", "Pérez", "juan@gmail.com", "password1", 12345, 2022)
+profesor1 = Profesor("Profesor", "Ejemplo", "prof@gmail.com", "password2", "PhD", 2010)
 
 curso1 = Curso("Ingles I")
 curso2 = Curso("Ingles II")
@@ -84,7 +23,7 @@ profesor1.dictar_curso(curso6)
 #funcion para buscar alumno
 def login_alumno(email, password):
     for alumno in alumnos:
-        if alumno.email == email:
+        if alumno._email == email:
 
             if alumno.validar_credenciales(email, password):
                 return alumno
@@ -99,7 +38,7 @@ def login_alumno(email, password):
 #para buscar profesor
 def login_profesor(email, password):
     for profesor in profesores:
-        if profesor.email == email:
+        if profesor._email == email:
             if profesor.validar_credenciales(email, password):
                 return profesor
             else:
@@ -109,10 +48,13 @@ def login_profesor(email, password):
     print("Por favor, debe darse de alta en alumnado. ")
 
 
+# Lista de alumnos y profesores
 alumnos = [alumno1]
 profesores = [profesor1]
 
 cursos_sistema = [curso1, curso2, curso3, curso4, curso5, curso6]
+
+codigo_admin = "admiutn"
 
 while True:
     print("\nMenú Principal:")
@@ -133,14 +75,15 @@ while True:
             while True:
                 print("\nSubmenú Alumno:")
                 print("1. Matricularse en un curso")
-                print("2. Ver cursos matriculados")
-                print("3. Volver al menú principal")
+                print("2. Desmatricularse de un curso")
+                print("3. Ver cursos matriculados")
+                print("4. Volver al menú principal")
                 sub_opcion = input("Seleccione una opción: ")
 
                 if sub_opcion == "1":
                     print("\nCursos disponibles:")
                     for i, curso in enumerate(cursos_sistema, start=1):
-                        print(f"{i}. {curso.nombre}")
+                        print(f"{i}. {curso._nombre}")
 
                     curso_index = int(input("Seleccione un curso para matricularse: ")) - 1
 
@@ -148,13 +91,12 @@ while True:
                         curso_seleccionado = cursos_sistema[curso_index]
 
                         if curso_seleccionado not in alumno.mi_cursos:
-                            contraseña_curso = input(f"Ingrese la contraseña para {curso_seleccionado.nombre}: ")
+                            contraseña_curso = input(f"Ingrese la contraseña para {curso_seleccionado._nombre}: ")
 
-                            if contraseña_curso == curso_seleccionado.contraseña:
-                                
+                            if contraseña_curso == curso_seleccionado._contraseña:
                                 matriculado = alumno.matricular_en_curso(curso_seleccionado)
                                 if matriculado:
-                                    print(f"Matriculación exitosa en {curso_seleccionado.nombre}")
+                                    print(f"Matriculación exitosa en {curso_seleccionado._nombre}")
                                 else:
                                     print("Error: No se pudo matricular en el curso.")
                             else:
@@ -162,15 +104,26 @@ while True:
                         else:
                             print("Error: Ya se encuentra matriculado en este curso.")
                     else:
-                        print("Error: Seleccion no valida.")
-
+                        print("Error: Selección no válida.")
 
                 elif sub_opcion == "2":
                     print("\nCursos matriculados:")
                     for i, curso in enumerate(alumno.mi_cursos, start=1):
-                        print(f"{i}. {curso.nombre}")
+                        print(f"{i}. {curso._nombre}")
+                    opc = int(input("Ingrese el número de curso del que desea desmatricularse: "))
+
+                    while opc < 1 or opc > len(alumno.mi_cursos):
+                        opc = int(input("\nError! Ingrese un número de curso válido:\n"))
+
+                    seleccionado_desmatricular = alumno.mi_cursos[opc - 1]
+                    alumno.desmatricular_del_curso(seleccionado_desmatricular)      
 
                 elif sub_opcion == "3":
+                    print("\nCursos matriculados:")
+                    for i, curso in enumerate(alumno.mi_cursos, start=1):
+                        print(f"{i}. {curso._nombre}")
+
+                elif sub_opcion == "4":
                     break
 
                 else:
@@ -191,12 +144,11 @@ while True:
                 sub_opcion = input("Seleccione una opción: ")
 
                 if sub_opcion == "1":
-                    nombre_curso = input(
-                        "Ingrese el nombre del curso a dar de alta: ")
+                    nombre_curso = input("Ingrese el nombre del curso a dar de alta: ")
                     
                     curso_existente = None
                     for curso in profesor.mis_cursos:
-                        if curso.nombre == nombre_curso:
+                        if curso._nombre == nombre_curso:
                             curso_existente = curso
                             break
                     if curso_existente:
@@ -205,24 +157,67 @@ while True:
                         nuevo_curso = Curso(nombre_curso)
                         profesor.dictar_curso(nuevo_curso)
                         print(f"Curso dado de alta:\n{str(nuevo_curso)}")
-
                 elif sub_opcion == "2":
                     print("\nCursos dictados:")
                     for i, curso in enumerate(profesor.mis_cursos, start=1):
-                        print(
-                            f"{i}. {curso.nombre}\nContraseña: {curso.contraseña}")
+                        print(f"{i}. {curso._nombre}\nContraseña: {curso._contraseña}")
+
+                    agregar_archivos = input("¿Desea agregar un archivo adjunto a uno de sus cursos dictados? (Si/No): ").lower()
+    
+                    if agregar_archivos == "si":
+                        print("\nCursos dictados:")
+                        for i, curso in enumerate(profesor.mis_cursos, start=1):
+                            print(f"{i}. {curso._nombre}\nContraseña: {curso._contraseña}")
+                        
+                        opc_curso = int(input("Seleccione un curso al que desea agregar un archivo adjunto: ")) - 1
+
+                        if 0 <= opc_curso < len(profesor.mis_cursos):
+                            curso_seleccionado = profesor.mis_cursos[opc_curso]
+
+                            while True:
+                                nombre_archivo = input("Ingrese el nombre del archivo: ")
+                                formato_archivo = input("Ingrese el formato del archivo: ")
+                                archivo = Archivo(nombre_archivo, formato_archivo)
+                                curso_seleccionado.agregar_archivo(archivo)
+                                print("Archivo adjunto agregado con éxito.")
+
+                                continuar = input("¿Desea agregar otro archivo adjunto? (Si/No): ").lower()
+                                if continuar != "si":
+                                    break
+                        else:
+                            print("Selección no válida. Por favor, elija un curso válido.")
+                    elif agregar_archivos == "no":
+                        print("Volviendo al menú principal.")
+                    else:
+                        print("Opción no válida. Por favor, seleccione una opción válida (Si/No).")
 
                 elif sub_opcion == "3":
                     break
                 else:
                     print("Opción no válida. Por favor, seleccione una opción válida.")
+        else:
+            codigo_admin_ingresado = input("Ingrese el código para darse de alta como profesor: ")
+            if codigo_admin_ingresado == codigo_admin:
+                nombre = input("Ingrese su nombre: ")
+                apellido = input("Ingrese su apellido: ")
+                email = input("Ingrese su email: ")
+                password = input("Ingrese su contraseña: ")
+                titulo = input("Ingrese su título: ")
+                anio_egreso = input("Ingrese el año de egreso: ")
 
+                nuevo_profesor = Profesor(nombre, apellido, email, password, titulo, anio_egreso)
+                profesores.append(nuevo_profesor)
+
+                print("Registro de profesor exitoso.")
+            else:
+                print("Código incorrecto. No se pudo registrar como profesor.")
 
     elif opcion == "3":
         print("\nCursos en el sistema:")
-        for i, curso in enumerate(cursos_sistema, start=1):
-            print(
-                f"{i}. Materia: {curso.nombre} Carrera: Tecnicatura Universitaria en Programación")
+        
+        sorted_cursos = sorted(cursos_sistema, key=lambda curso: curso._nombre)
+        for curso in sorted_cursos:
+            print(f"Materia: {curso._nombre} Carrera: Tecnicatura Universitaria en Programación")
 
     elif opcion == "4":
         print("Saliendo del sistema. ¡Hasta luego!")
